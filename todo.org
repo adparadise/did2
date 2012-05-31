@@ -1,5 +1,12 @@
 
 
+* --which
+to disambiguate where logs are being written
+
+* --archive
+automatically issue a git commit with a meaningful message
+? issue a git pull --rebase/push as well?
+
 * gihub publish
 make a new repo, or branch on existing?
 

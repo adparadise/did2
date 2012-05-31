@@ -55,6 +55,6 @@ class Did
   end
 
   def self.resolve_home home
-    Pathname.new(home || ENV['DID_HOME'] || Dir.pwd) + ".did"
+    Pathname.new(home || ENV['DID_HOME'] || '~').expand_path + ".did"
   end
 end
