@@ -18,7 +18,7 @@ class Did
     when :log
       log arguments
     when :report
-      report
+      report arguments
     when :list
       list arguments
     end
@@ -34,11 +34,11 @@ class Did
     tag_pool.add_tags(tags)
   end
 
-  def report
+  def report(arguments)
     now = Time.now
 
     sheet = Did::Sheet.new(self, now)
-    sheet.report
+    sheet.report(arguments)
   end
 
   def list(arguments)

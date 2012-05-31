@@ -16,9 +16,14 @@ class Did::Sheet
     write_to_file "#{time_string} #{tags.join(" ")}\n"
   end
 
-  def report
+  def report(arguments)
     tags = summary.keys.sort
+    included = arguments.reject {|arg| arg =~ /^--/}
+    is_filtered = included.length > 0
     tags.each do |tag|
+      if is_filtered
+        next if included.detect {|arg| !tag.include? arg}
+      end
       duration = summary[tag]
       STDOUT << "#{tag.rjust(max_tags_length)}: #{Did::Sheet.duration_to_s(duration)}\n"
     end
