@@ -1,0 +1,42 @@
+
+
+* gihub publish
+make a new repo, or branch on existing?
+
+* --amend last entry
+replace all tags on last entry with the tags provided
+
+* gemify
+create structure for gem locally
+replace old gem or make a new one?
+
+* --report targeting
+provide a list of tags to include in the list
+
+* --report combinatorial tags
+for entries with 3 or more tags
+  include all combinations of 2 tags, etc.
+
+* --report entire project
+roll up multiple days in reports, for all time
+
+* --report across days
+roll up multiple days in reports, with targeted bounds
+
+* --list 
+emit today's timesheet so far, with durations between entries
+
+* --list ranges
+emit sensible ranges similar to git, HEAD~N
+
+* overnight
+execute an operation to fix a task that spans days
+it would:
+  find the last entry on the prior day, 
+  reenter it for 11:59:59 on that day
+  and reenter it for 12:00:00 on the next day
+
+* ?git ignore/rebuild tags
+make a decision on how git is to be supported
+should tags be left out of the repo?
+how would they be managed after pulls?
