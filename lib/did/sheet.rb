@@ -1,5 +1,6 @@
 require 'fileutils'
 
+# A log of events for a particular day.
 class Did::Sheet
   def initialize(did, date)
     @did = did
