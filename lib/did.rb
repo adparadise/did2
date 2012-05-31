@@ -13,6 +13,8 @@ class Did
 
   def command arguments
     case classify arguments
+    when :which
+      which
     when :log
       log arguments
     when :report
@@ -46,6 +48,10 @@ class Did
     sheet.list
   end
 
+  def which
+    STDOUT << "did home: #{@home.to_s}\n"
+  end
+
   def autocomplete tag_fragment
     tag_pool = Did::TagPool.new(self)
     suggestions = tag_pool.autocomplete(tag_fragment)
@@ -60,6 +66,8 @@ class Did
       :report
     elsif arguments.include?("--list")
       :list
+    elsif arguments.include?("--which")
+      :which
     else
       :log
     end
