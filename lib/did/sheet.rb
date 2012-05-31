@@ -14,14 +14,14 @@ class Did::Sheet
 
   private
 
-  def filename
+  def filepath
     date_string = @date.strftime("%Y-%m-%d")
-    @did.home + "/#{date_string[0..6]}/#{date_string}"
+    @did.home + date_string[0..6] + date_string
   end
 
   def write_to_file(contents)
-    FileUtils.mkdir_p(File.dirname(filename))
-    File.open(filename, "a") do |file|
+    FileUtils.mkdir_p(filepath.dirname)
+    File.open(filepath, "a") do |file|
       file.write(contents)
     end
   end

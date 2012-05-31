@@ -1,3 +1,4 @@
+require 'pathname'
 
 # Controller for the Did utility.
 class Did
@@ -30,6 +31,6 @@ class Did
   private
 
   def self.resolve_home home
-    (home || ENV['DID_HOME'] || Dir.pwd) + "/.did"
+    Pathname.new(home || ENV['DID_HOME'] || Dir.pwd) + ".did"
   end
 end

@@ -1,3 +1,4 @@
+require 'pathname'
 
 # A class to manage lists of all tags in this repository.
 class Did::TagPool
@@ -16,20 +17,20 @@ class Did::TagPool
 
   private
 
-  def filename
-    @did.home + "/tags"
+  def filepath
+    @did.home + "tags"
   end
 
   def tags
-    return [] if !File.exist?(filename)
-    File.readlines(filename).map {|line| line.strip}
+    return [] if !filepath.exist?
+    filepath.readlines.map {|line| line.strip}
   end
 
   def write_tags(tags)
-    temp_filename = filename + "_temp"
-    File.open(temp_filename, "w") do |file|
+    temp_filepath = Pathname.new(filepath.to_s + "_temp")
+    File.open(temp_filepath, "w") do |file|
       file.write(tags.join("\n") + "\n")
     end
-    File.rename(temp_filename, filename)
+    File.rename(temp_filepath, filepath)
   end
 end
