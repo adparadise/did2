@@ -17,6 +17,8 @@ class Did
       log arguments
     when :report
       report
+    when :list
+      list arguments
     end
   end
   
@@ -37,6 +39,13 @@ class Did
     sheet.report
   end
 
+  def list(arguments)
+    now = Time.now
+    
+    sheet = Did::Sheet.new(self, now)
+    sheet.list
+  end
+
   def autocomplete tag_fragment
     tag_pool = Did::TagPool.new(self)
     suggestions = tag_pool.autocomplete(tag_fragment)
@@ -49,6 +58,8 @@ class Did
   def classify arguments
     if arguments.include?("--report")
       :report
+    elsif arguments.include?("--list")
+      :list
     else
       :log
     end

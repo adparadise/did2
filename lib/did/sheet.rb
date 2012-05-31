@@ -4,6 +4,8 @@ require 'set'
 
 # A log of events for a particular day.
 class Did::Sheet
+  include Enumerable
+
   def initialize(did, date)
     @did = did
     @date = date
@@ -16,25 +18,58 @@ class Did::Sheet
 
   def report
     tags = summary.keys.sort
-    max_length = (tags.map{|tag| tag.length}.max || 0) + 1
     tags.each do |tag|
       duration = summary[tag]
-      STDOUT << "#{tag.rjust(max_length)}: #{Did::Sheet.duration_to_s(duration)}\n"
+      STDOUT << "#{tag.rjust(max_tags_length)}: #{Did::Sheet.duration_to_s(duration)}\n"
     end
+  end
+
+  def list
+    final_time = nil
+    each do |time, tags, delta|
+      STDOUT << "#{time} #{tags.join(" ").ljust(max_tags_length)} #{delta && Did::Sheet.duration_to_s(delta)}\n"
+      final_time = time
+    end
+    final_delta = Time.now - final_time
+    STDOUT << "#{Time.now} #{"...".center(max_tags_length)} #{final_delta && Did::Sheet.duration_to_s(final_delta)}\n"
   end
 
   def self.duration_to_s duration
     seconds = duration % 60
     minutes = ((duration - seconds) / 60) % 60
     hours = (duration - seconds - minutes * 60) / (60 * 60)
-    sprintf("%03d:%02d:%02d (%ds)", hours, minutes, seconds, duration)
+    sprintf("%03d:%02d:%02d (% 6ds)", hours, minutes, seconds, duration)
+  end
+
+  def each
+    prior = nil
+    lines.each do |line|
+      fragments = line.split
+
+      time = Time.parse(fragments[0..2].join(" "))
+      tags = fragments[3..-1]
+      yield time, tags, (prior && time - prior)
+      prior = time
+    end
   end
 
   private
 
+  def lines
+    if !@lines
+      @lines = []
+      @lines = File.readlines(filepath).map {|line| line.strip} if filepath.exist?
+    end
+    @lines
+  end
+
   def filepath
     date_string = @date.strftime("%Y-%m-%d")
     @did.home + date_string[0..6] + date_string
+  end
+
+  def max_tags_length
+    @max_tags_length ||= (map {|time, tags| tags.join(" ").length}.max || 0) + 1
   end
 
   def write_to_file(contents)
@@ -45,23 +80,15 @@ class Did::Sheet
   end
 
   def summary
-    lines = File.readlines(filepath).map {|line| line.strip}
     summary = {}
-    prior = nil
-    lines.each do |line|
-      fragments = line.split
-
-      time = Time.parse(fragments[0..2].join(" "))
-      tags = Set.new(fragments[3..-1])
-      tags.add(tags.to_a.join(" "))
-
-      if prior
-        delta = time - prior
-        tags.each do |tag|
+    each do |time, tags, delta|
+      tag_set = Set.new(tags)
+      tag_set.add(tags.join(" "))
+      if delta
+        tag_set.each do |tag|
           summary[tag] = (summary[tag] || 0) + delta
         end
       end
-      prior = time
     end
     summary
   end
