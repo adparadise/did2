@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+$: << File.realpath(File.dirname(__FILE__) + "/../lib")
+require 'did'
+
+did_home = (ENV['DID_HOME'] || Dir.pwd) + "/.did"
+did = Did.new(did_home)
+
+did.command($*)
+
+
