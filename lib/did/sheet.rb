@@ -19,8 +19,15 @@ class Did::Sheet
     max_length = (tags.map{|tag| tag.length}.max || 0) + 1
     tags.each do |tag|
       duration = summary[tag]
-      STDOUT << "#{tag.rjust(max_length)}: #{Did::Sheet.duration_to_string(duration)}\n"
+      STDOUT << "#{tag.rjust(max_length)}: #{Did::Sheet.duration_to_s(duration)}\n"
     end
+  end
+
+  def self.duration_to_s duration
+    seconds = duration % 60
+    minutes = ((duration - seconds) / 60) % 60
+    hours = (duration - seconds - minutes * 60) / (60 * 60)
+    sprintf("%03d:%02d:%02d (%ds)", hours, minutes, seconds, duration)
   end
 
   private
@@ -57,12 +64,5 @@ class Did::Sheet
       prior = time
     end
     summary
-  end
-
-  def self.duration_to_string duration
-    seconds = duration % 60
-    minutes = ((duration - seconds) / 60) % 60
-    hours = (duration - seconds - minutes * 60) / 360
-    sprintf("%03d:%02d:%02d", hours, minutes, seconds)
   end
 end
