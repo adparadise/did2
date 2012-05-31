@@ -2,6 +2,4 @@
 $: << File.realpath(File.dirname(__FILE__) + "/../lib")
 require 'did'
 
-Did.new.log($*)
-
-
+Did.new.autocomplete($*[1])

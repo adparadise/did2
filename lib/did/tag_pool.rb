@@ -9,6 +9,11 @@ class Did::TagPool
     write_tags (tags + new_tags).sort.uniq
   end
 
+  def autocomplete(tag_fragment)
+    regexp = Regexp.new "^#{tag_fragment}"
+    tags.grep regexp
+  end
+
   private
 
   def filename
