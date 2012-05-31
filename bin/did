@@ -3,6 +3,6 @@ require 'pathname'
 $: << (Pathname.new(__FILE__).dirname + ".." + "lib").realpath.to_s
 require 'did'
 
-Did.new.log($*)
+Did.new.command $*
 
 
