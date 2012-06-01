@@ -29,6 +29,12 @@ class Did::Sheet
     end
   end
 
+  def tree
+    entropy = Did::Entropy.new
+    entropy.build(self)
+    puts entropy.priority
+  end
+
   def list
     final_time = nil
     each do |time, tags, delta|
@@ -97,4 +103,5 @@ class Did::Sheet
     end
     summary
   end
+
 end

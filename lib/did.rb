@@ -4,6 +4,7 @@ require 'pathname'
 class Did
   autoload :Sheet, "did/sheet"
   autoload :TagPool, "did/tag_pool"
+  autoload :Entropy, "did/entropy"
 
   attr_reader :home
 
@@ -21,6 +22,8 @@ class Did
       report arguments
     when :list
       list arguments
+    when :tree
+      tree
     end
   end
   
@@ -48,6 +51,12 @@ class Did
     sheet.list
   end
 
+  def tree
+    now = Time.now
+    sheet = Did::Sheet.new(self, now)
+    sheet.tree
+  end
+
   def which
     STDOUT << "did home: #{@home.to_s}\n"
   end
@@ -68,6 +77,8 @@ class Did
       :list
     elsif arguments.include?("--which")
       :which
+    elsif arguments.include?("--tree")
+      :tree
     else
       :log
     end

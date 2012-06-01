@@ -14,9 +14,6 @@ replace all tags on last entry with the tags provided
 create structure for gem locally
 replace old gem or make a new one?
 
-* --report targeting
-provide a list of tags to include in the list
-
 * --report trees
 smarter profile reports to show breakdowns
 
@@ -46,6 +43,7 @@ should tags be left out of the repo?
 how would they be managed after pulls?
 
 
+
 * --which
 to disambiguate where logs are being written
 
@@ -53,3 +51,6 @@ to disambiguate where logs are being written
 * --list 
 emit today's timesheet so far, with durations between entries
 
+
+* --report targeting
+provide a list of tags to include in the list
