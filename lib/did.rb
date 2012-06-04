@@ -1,4 +1,5 @@
 require 'pathname'
+require 'date'
 
 # Controller for the Did utility.
 class Did
@@ -38,10 +39,12 @@ class Did
   end
 
   def report(arguments)
+    argument_params = Did::resolve_dates(arguments, Time.now)
+    
     now = Time.now
 
     sheet = Did::Sheet.new(self, now)
-    sheet.report(arguments)
+    sheet.report(argument_params[:arguments])
   end
 
   def list(arguments)
@@ -86,5 +89,37 @@ class Did
 
   def self.resolve_home home
     Pathname.new(home || ENV['DID_HOME'] || '~').expand_path + ".did"
+  end
+
+  def self.resolve_dates arguments, today
+    result = {
+      :arguments => [],
+      :on => today
+    }
+    index = 0
+    while index < 100
+      break if index >= arguments.length
+      if arguments[index] == "--on" && arguments[index + 1]
+        date_params = Did::resolve_date(arguments, today, index + 1)
+        result[:on] = date_params[:date]
+        index += 1 + date_params[:offset]
+      else 
+        result[:arguments].push(arguments[index])
+      end
+      index += 1
+    end
+    result
+  end
+
+  def self.resolve_date arguments, today, index
+    date_params = {
+      :date => today,
+      :offset => 0
+    }
+    if arguments[index] =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/
+      date_params[:date] = Date.strptime(arguments[index], "%Y-%m-%d")
+      date_params[:offset] = 0
+    end
+    date_params
   end
 end

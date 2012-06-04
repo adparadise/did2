@@ -13,6 +13,8 @@ it would:
 ** --amend last entry
 replace all tags on last entry with the tags provided
 
+** autofill last matching
+helpful for longer strings of tags, in common configurations
 * deployment
 ** gemify
 create structure for gem locally
