@@ -37,12 +37,15 @@ class Did::Sheet
 
   def list
     final_time = nil
+    total_time = 0
     each do |time, tags, delta|
       STDOUT << "#{time} #{tags.join(" ").ljust(max_tags_length)} #{delta && Did::Sheet.duration_to_s(delta)}\n"
+      total_time += delta if delta
       final_time = time
     end
     final_delta = Time.now - final_time
     STDOUT << "#{Time.now} #{"...".center(max_tags_length)} #{final_delta && Did::Sheet.duration_to_s(final_delta)}\n"
+    STDOUT << "#{"total".rjust(max_tags_length + 26)} #{Did::Sheet.duration_to_s(total_time)}\n"
   end
 
   def self.duration_to_s duration
