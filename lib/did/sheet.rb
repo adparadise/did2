@@ -62,7 +62,7 @@ class Did::Sheet
 
       time = Time.parse(fragments[0..2].join(" "))
       tags = fragments[3..-1]
-      yield time, tags, (prior && time - prior)
+      yield time, tags, (prior && time - prior) if !(tags[0] =~ /^\</)
       prior = time
     end
   end
