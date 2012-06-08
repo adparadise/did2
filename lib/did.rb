@@ -40,8 +40,7 @@ class Did
 
   def report(arguments)
     argument_params = Did::resolve_dates(arguments, Time.now)
-    
-    now = Time.now
+    now = argument_params[:on]
 
     sheet = Did::Sheet.new(self, now)
     sheet.report(argument_params[:arguments])
