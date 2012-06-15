@@ -20,6 +20,7 @@ class Did::Sheet
     tags = summary.keys.sort
     included = arguments.reject {|arg| arg =~ /^--/}
     is_filtered = included.length > 0
+    STDOUT << "#{(" " * max_tags_length)}  #{date_description}\n"
     tags.each do |tag|
       if is_filtered
         next if included.detect {|arg| !tag.include? arg}
@@ -27,6 +28,10 @@ class Did::Sheet
       duration = summary[tag]
       STDOUT << "#{tag.rjust(max_tags_length)}: #{Did::Sheet.duration_to_s(duration)}\n"
     end
+  end
+
+  def date_description
+    @date.strftime("%A, %B %-d, %Y")
   end
 
   def tree

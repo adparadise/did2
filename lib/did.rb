@@ -29,7 +29,7 @@ class Did
   end
   
   def log tags
-    now = Time.now
+    now = DateTime.now
 
     sheet = Did::Sheet.new(self, now)
     sheet.write(now, tags)
@@ -39,7 +39,7 @@ class Did
   end
 
   def report(arguments)
-    argument_params = Did::resolve_dates(arguments, Time.now)
+    argument_params = Did::resolve_dates(arguments, DateTime.now)
     now = argument_params[:on]
 
     sheet = Did::Sheet.new(self, now)
@@ -47,14 +47,14 @@ class Did
   end
 
   def list(arguments)
-    now = Time.now
+    now = DateTime.now
     
     sheet = Did::Sheet.new(self, now)
     sheet.list
   end
 
   def tree
-    now = Time.now
+    now = DateTime.now
     sheet = Did::Sheet.new(self, now)
     sheet.tree
   end
@@ -99,7 +99,7 @@ class Did
     while index < 100
       break if index >= arguments.length
       if arguments[index] == "--on" && arguments[index + 1]
-        date_params = Did::resolve_date(arguments, today, index + 1)
+        date_params = Did::resolve_date_on(arguments, today, index + 1)
         result[:on] = date_params[:date]
         index += 1 + date_params[:offset]
       else 
@@ -110,13 +110,21 @@ class Did
     result
   end
 
-  def self.resolve_date arguments, today, index
+  def self.resolve_date_on arguments, today, index
     date_params = {
       :date => today,
       :offset => 0
     }
+    days = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
     if arguments[index] =~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/
       date_params[:date] = Date.strptime(arguments[index], "%Y-%m-%d")
+      date_params[:offset] = 0
+    elsif days.detect {|day| arguments[index][0..2].downcase == day}
+      wday = days.index(arguments[index][0..2].downcase)
+      day_offset = ((today.wday - wday) % 7)
+      day_offset = 7 if day_offset == 0
+
+      date_params[:date] = today - day_offset
       date_params[:offset] = 0
     end
     date_params
