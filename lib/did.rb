@@ -6,6 +6,7 @@ class Did
   autoload :Sheet, "did/sheet"
   autoload :TagPool, "did/tag_pool"
   autoload :Entropy, "did/entropy"
+  autoload :Git, "did/git"
 
   attr_reader :home
 
@@ -25,6 +26,8 @@ class Did
       list arguments
     when :tree
       tree
+    when :sync
+      sync
     end
   end
   
@@ -63,6 +66,11 @@ class Did
     STDOUT << "did home: #{@home.to_s}\n"
   end
 
+  def sync
+    git = Did::Git.new(self)
+    STDOUT << git.sync
+  end
+
   def autocomplete tag_fragment
     tag_pool = Did::TagPool.new(self)
     suggestions = tag_pool.autocomplete(tag_fragment)
@@ -81,6 +89,8 @@ class Did
       :which
     elsif arguments.include?("--tree")
       :tree
+    elsif arguments.include?("--sync")
+      :sync
     else
       :log
     end
