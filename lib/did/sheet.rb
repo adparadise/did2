@@ -78,6 +78,7 @@ class Did::Sheet
     if !@lines
       @lines = []
       @lines = File.readlines(filepath).map {|line| line.strip} if filepath.exist?
+      @lines = @lines.map {|line| line.length > 0 ? line : nil}.compact
     end
     @lines
   end
