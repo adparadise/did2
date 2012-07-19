@@ -15,6 +15,11 @@ replace all tags on last entry with the tags provided
 
 ** autofill last matching
 helpful for longer strings of tags, in common configurations
+** autofill from git
+last commit time
+** autofill from last modified
+within current directory   
+find . -type f| grep  -v '\.git'  | xargs -n1 ls -la | cut -d' ' -f 6-100 | sort | tail -n 1
 * deployment
 ** gemify
 create structure for gem locally
@@ -41,6 +46,7 @@ emit sensible ranges similar to git, HEAD~N
 ** --archive
 automatically issue a git commit with a meaningful message
 ? issue a git pull --rebase/push as well?
+git add .; git commit -m "message"; git pull --rebase; #resolve conflicts; git add .; git rebase --continue; git push
 
 ** ?git ignore/rebuild tags
 make a decision on how git is to be supported
