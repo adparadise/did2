@@ -26,6 +26,8 @@ class Did
       list arguments
     when :tree
       tree
+    when :timesheets
+      timesheets arguments
     when :sync
       sync
     end
@@ -71,6 +73,23 @@ class Did
     STDOUT << git.sync
   end
 
+  def timesheets arguments
+    argument_params = Did::resolve_dates(arguments, DateTime.now)
+    week = argument_params[:week]
+    argument_params[:arguments] <<  "--rounded"
+
+    sheets = Did::Sheet.sheets_week_of(self, week)
+    max_tags_length = sheets.map do |sheet|
+      sheet.max_tags_length
+    end.max
+    argument_params[:arguments] << "--indent-amount"
+    argument_params[:arguments] << max_tags_length.to_s
+    sheets.each do |sheet|
+      sheet.report(argument_params[:arguments])
+      STDOUT << "\n"
+    end
+  end
+
   def autocomplete tag_fragment
     tag_pool = Did::TagPool.new(self)
     suggestions = tag_pool.autocomplete(tag_fragment)
@@ -91,6 +110,8 @@ class Did
       :tree
     elsif arguments.include?("--sync")
       :sync
+    elsif arguments.include?("--timesheets")
+      :timesheets
     else
       :log
     end
@@ -103,7 +124,8 @@ class Did
   def self.resolve_dates arguments, today
     result = {
       :arguments => [],
-      :on => today
+      :on => today,
+      :week => today
     }
     index = 0
     while index < 100
@@ -112,6 +134,9 @@ class Did
         date_params = Did::resolve_date_on(arguments, today, index + 1)
         result[:on] = date_params[:date]
         index += 1 + date_params[:offset]
+      elsif arguments[index] == "--back" && arguments[index + 1]
+        result[:week] = today - 7 * arguments[index + 1].to_i
+        index += 1
       else 
         result[:arguments].push(arguments[index])
       end

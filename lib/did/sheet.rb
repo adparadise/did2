@@ -11,22 +11,58 @@ class Did::Sheet
     @date = date
   end
 
+  def self.sheets_week_of(did, date)
+    date = date - date.wday 
+    sheets = []
+    0.upto(6) do |wday|
+      sheets << Did::Sheet.new(did, date + wday)
+    end
+    sheets
+  end
+
   def write(time, tags)
     time_string = time.strftime("%Y-%m-%d %H:%M:%S %z")
     write_to_file "#{time_string} #{tags.join(" ")}\n"
   end
 
+  def report_arguments(arguments)
+    arguments = Array.new(arguments)
+    indent_amount_index = arguments.index('--indent-amount')
+    indent_amount = 0
+    if (indent_amount_index && arguments[indent_amount_index + 1])
+      indent_amount = arguments[indent_amount_index + 1].to_i
+      arguments[indent_amount_index..indent_amount_index+1] = []
+    else
+      indent_amount = max_tags_length
+    end
+
+    included = arguments.reject {|arg| arg =~ /^--/}
+
+    return {
+      :included => included,
+      :is_filtered => included.length > 0,
+      :rounded => arguments.include?("--rounded"),
+      :indent_amount => indent_amount
+    }
+  end
+
   def report(arguments)
     tags = summary.keys.sort
-    included = arguments.reject {|arg| arg =~ /^--/}
-    is_filtered = included.length > 0
-    STDOUT << "#{(" " * max_tags_length)}  #{date_description}\n"
+    arguments = report_arguments(arguments)
+    
+    STDOUT << "#{(" " * arguments[:indent_amount])}  #{date_description}\n"
     tags.each do |tag|
-      if is_filtered
-        next if included.detect {|arg| !tag.include? arg}
+      if arguments[:is_filtered]
+        next if arguments[:included].detect {|arg| !tag.include? arg}
       end
       duration = summary[tag]
-      STDOUT << "#{tag.rjust(max_tags_length)}: #{Did::Sheet.duration_to_s(duration)}\n"
+
+      if (arguments[:rounded])
+        duration_string = Did::Sheet.duration_rounded(duration)
+      else
+        duration_string = Did::Sheet.duration_to_s(duration)
+      end
+      STDOUT << "#{tag.rjust(arguments[:indent_amount])}: #{duration_string}\n"
     end
   end
 
@@ -60,6 +96,14 @@ class Did::Sheet
     sprintf("%03d:%02d:%02d (% 6ds)", hours, minutes, seconds, duration)
   end
 
+  def self.duration_rounded duration
+    seconds = duration % 60
+    minutes = ((duration - seconds) / 60) % 60
+    hours = (duration - seconds - minutes * 60) / (60 * 60)
+    hour_portions = (minutes.to_i * 4 / 60) / 4.0
+    sprintf("%.2f", hours + hour_portions)
+  end
+
   def each
     prior = nil
     lines.each do |line|
@@ -70,6 +114,10 @@ class Did::Sheet
       yield time, tags, (prior && time - prior) if !(tags[0] =~ /^\</)
       prior = time
     end
+  end
+
+  def max_tags_length
+    @max_tags_length ||= (map {|time, tags| tags.join(" ").length}.max || 0) + 1
   end
 
   private
@@ -86,10 +134,6 @@ class Did::Sheet
   def filepath
     date_string = @date.strftime("%Y-%m-%d")
     @did.home + date_string[0..6] + date_string
-  end
-
-  def max_tags_length
-    @max_tags_length ||= (map {|time, tags| tags.join(" ").length}.max || 0) + 1
   end
 
   def write_to_file(contents)
