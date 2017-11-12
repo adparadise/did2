@@ -49,13 +49,15 @@ class Did::Sheet
   def report(arguments)
     tags = summary.keys.sort
     arguments = report_arguments(arguments)
-    
+    total_time = 0
+
     STDOUT << "#{(" " * arguments[:indent_amount])}  #{date_description}\n"
     tags.each do |tag|
       if arguments[:is_filtered]
         next if arguments[:included].detect {|arg| !tag.include? arg}
       end
       duration = summary[tag]
+      total_time += duration if duration
 
       if (arguments[:rounded])
         duration_string = Did::Sheet.duration_rounded(duration)
@@ -64,6 +66,8 @@ class Did::Sheet
       end
       STDOUT << "#{tag.rjust(arguments[:indent_amount])}: #{duration_string}\n"
     end
+    STDOUT << "#{"".rjust(arguments[:indent_amount] + 1)} ---------\n"
+    STDOUT << "#{"total:".rjust(arguments[:indent_amount] + 1)} #{Did::Sheet.duration_to_s(total_time)}\n"
   end
 
   def date_description

@@ -52,8 +52,9 @@ class Did
   end
 
   def list(arguments)
-    now = DateTime.now
-    
+    argument_params = Did::resolve_dates(arguments, DateTime.now)
+    now = argument_params[:on]
+
     sheet = Did::Sheet.new(self, now)
     sheet.list
   end
@@ -76,7 +77,6 @@ class Did
   def timesheets arguments
     argument_params = Did::resolve_dates(arguments, DateTime.now)
     week = argument_params[:week]
-    argument_params[:arguments] <<  "--rounded"
 
     sheets = Did::Sheet.sheets_week_of(self, week)
     max_tags_length = sheets.map do |sheet|
